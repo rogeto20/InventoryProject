@@ -1,0 +1,26 @@
+[
+  {
+    "ProductId": 1,
+    "ProductName": "Gloves",
+    "QuantityInStock": 10,
+    "BuyingPrice": 15
+  },
+  {
+    "ProductId": 2,
+    "ProductName": "Needles",
+    "QuantityInStock": 14,
+    "BuyingPrice": 20
+  },
+  {
+    "ProductId": 3,
+    "ProductName": "Sterile Gloves",
+    "QuantityInStock": 30,
+    "BuyingPrice": 45
+  },
+  {
+    "ProductId": 4,
+    "ProductName": "Masks",
+    "QuantityInStock": 70,
+    "BuyingPrice": 20
+  }
+]
