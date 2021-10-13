@@ -3,59 +3,99 @@
 
 <h3>Sales Summary</h3>
 
-<p>
-    Functionality to show sales summary will be added here.
-</p>
-<!--
-<p>This component demonstrates fetching data from the server.</p>
+<p>This component demonstrates sales data from the server.</p>
 
-@if (forecasts == null)
+@if (salesModel.Count == 0)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <table class="table">
+    <p>Total Profit = @profit Ksh</p>
+    <table class="table table-bordered table-hover">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
+                <th scope="col">Order Number</th>
+                <th scope="col">Product</th>
+                <th scope="col">Date Sold</th>
+                <th scope="col">Quantity Ordered</th>
+                <th scope="col">Selling Price</th>
+                <th scope="col">Buying Price</th>
+                <th scope="col">Profit</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
-            {
+            @foreach (var sale in salesModel)
+                {
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <td>@sale.OrderNumber</td>
+                    <td>@sale.ProductName</td>
+                    <td>@sale.DateSold</td>
+                    <td>@sale.QuantityOrdered</td>
+                    <td>@sale.SellingPrice</td>
+                    <td>@sale.BuyingPrice</td>
+                    <td>@sale.Profit</td>
                 </tr>
-            }
+                }
         </tbody>
     </table>
 }
--->
 
 
 @code {
-    private WeatherForecast[] forecasts;
+    private Sales[] sales;
+    private List<SalesViewModel> salesModel = new List<SalesViewModel>();
+    private Products[] products;
+    private int profit = 0;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        sales = await Http.GetFromJsonAsync<Sales[]>("sample-data/sales.json");
+        products = await Http.GetFromJsonAsync<Products[]>("sample-data/products.json");
+
+        foreach(var sale in sales)
+        {
+            var item = new SalesViewModel
+            {
+                    ProductName = products.FirstOrDefault(x => x.ProductId.Equals(sale.ProductId)).ProductName,
+                    OrderNumber = sale.OrderNumber,
+                    QuantityOrdered = sale.QuantityOrdered,
+                    SellingPrice = sale.SellingPrice,
+                    BuyingPrice = products.FirstOrDefault(x => x.ProductId.Equals(sale.ProductId)).BuyingPrice,
+                    DateSold = sale.DateSold,
+                    Profit = sale.SellingPrice - products.FirstOrDefault(x => x.ProductId.Equals(sale.ProductId)).BuyingPrice
+                };
+            salesModel.Add(item);
+            profit += item.Profit * item.QuantityOrdered;
+        }
     }
 
-    public class WeatherForecast
+    public class Sales
     {
-        public DateTime Date { get; set; }
-
-        public int TemperatureC { get; set; }
-
-        public string Summary { get; set; }
-
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        public int ProductId { get; set; }
+        public int OrderNumber { get; set; }
+        public int QuantityOrdered { get; set; }
+        public int SellingPrice { get; set; }
+        public DateTime DateSold { get; set; }
     }
+
+    public class SalesViewModel
+    {
+        public string ProductName { get; set; }
+        public int OrderNumber { get; set; }
+        public int QuantityOrdered { get; set; }
+        public int BuyingPrice { get; set; }
+        public int SellingPrice { get; set; }
+        public int Profit { get; set; }
+        public DateTime DateSold { get; set; }
+    }
+
+    public class Products
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public int QuantityInStock { get; set; }
+        public int BuyingPrice { get; set; }
+    }
+
 }
