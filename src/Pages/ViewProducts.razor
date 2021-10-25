@@ -1,5 +1,9 @@
 ﻿@page "/viewproducts"
+@using InventoryProject.Service.Product
+@using InventoryProject.ViewModels
+
 @inject HttpClient Http
+@inject IProductService ProductService
 
 <h3>Products</h3>
 
@@ -34,18 +38,20 @@ else
 
 
 @code {
-    private Products[] products;
+    private List<ProductViewModel> products = new();
 
     protected override async Task OnInitializedAsync()
     {
-        products = await Http.GetFromJsonAsync<Products[]>("sample-data/products.json");
-    }
+        //products = await Http.GetFromJsonAsync<Products[]>("sample-data/products.json");
+        var result = ProductService.GetProductById(1);
 
-    public class Products
-    {
-        public int ProductId { get; set; }
-        public string ProductName { get; set; }
-        public int QuantityInStock { get; set; }
-        public int BuyingPrice { get; set; }
+        products.Add(
+            new ProductViewModel 
+            { 
+                ProductName = result.ProductName, 
+                QuantityInStock = result.QuantityInStock, 
+                ProductId = result.ProductId,
+                BuyingPrice = result.BuyingPrice
+            });
     }
 }
